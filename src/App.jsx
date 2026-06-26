@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle, Search, User, Briefcase, Star, CreditCard, ChevronRight, UploadCloud, MessageCircle, RefreshCw, Send, Check, Loader2, Sparkles, ShieldCheck, Wallet, ArrowRight, Wrench, Zap, AlertCircle, MapPin, Navigation, Clock } from 'lucide-react';
+import profileImg from './assets/profile.png';
 
-const Logo = ({ className = "text-4xl" }) => (
-  <div className={`font-extrabold tracking-tighter flex items-center justify-center drop-shadow-sm ${className}`}>
-    <span className="text-green-600">Bayani</span>
-    <span className="text-orange-500">Gigs</span>
+const Logo = ({ className = "text-3xl", subtitle }) => (
+  <div className={`flex items-center justify-center drop-shadow-sm ${className}`}>
+    <img src={profileImg} alt="BayaniGigs Logo" className="h-[1.1em] w-[1.1em] shrink-0 mr-2.5 object-cover rounded-full border-[3px] border-green-500 shadow-sm" />
+    <div className="flex flex-col items-start">
+      <div className="font-extrabold tracking-tighter leading-none">
+        <span className="text-green-600">Bayani</span>
+        <span className="text-orange-500">Gigs</span>
+      </div>
+      {subtitle && <p className="text-gray-500 mt-1 font-medium text-[15px] tracking-normal">{subtitle}</p>}
+    </div>
   </div>
 );
 
@@ -62,8 +69,7 @@ export default function App() {
             <div className="p-6 h-full flex flex-col justify-center animate-fly-in">
               <div className="flex-1 flex flex-col justify-center items-center space-y-12">
                 <div className="animate-float">
-                  <Logo className="text-6xl" />
-                  <p className="text-center text-gray-500 mt-3 font-medium">Empowering local skills.</p>
+                  <Logo className="text-4xl" subtitle="Empowering local skills." />
                 </div>
                 
                 <div className="w-full space-y-4">
@@ -168,7 +174,7 @@ export default function App() {
                 <div className="flex-1 flex flex-col items-center justify-center p-6 animate-fly-in">
                   <div className="relative mb-8">
                     <div className="w-32 h-32 rounded-full border-4 border-green-500 bg-white shadow-xl flex items-center justify-center overflow-hidden relative z-10">
-                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria&backgroundColor=fde68a" alt="Customer" className="w-full h-full object-cover" />
+                      <img src={profileImg} alt="Customer" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white p-2 rounded-full border-4 border-gray-50 shadow-sm z-20">
                       <MapPin size={20} fill="currentColor" />
@@ -197,7 +203,7 @@ export default function App() {
               <div className="flex-1 p-6 flex flex-col justify-center items-center animate-fly-in">
                 <div className="relative mb-8">
                   <div className="w-32 h-32 rounded-full border-4 border-orange-500 flex items-center justify-center bg-white shadow-xl z-10 relative overflow-hidden">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${role === 'worker' ? 'Maria' : 'Tonyo'}&backgroundColor=${role === 'worker' ? 'fde68a' : 'b6e3f4'}`} alt="User" className="w-full h-full object-cover" />
+                    <img src={profileImg} alt="User" className="w-full h-full object-cover" />
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-gray-50 shadow-sm z-20">
                     <Zap size={20} fill="currentColor" />
@@ -399,7 +405,7 @@ const JobRequestsScreen = ({ onComplete }) => {
         {jobs.map(job => (
           <div key={job.id} className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-fly-in">
             <div className="flex items-start gap-3 mb-3">
-              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${job.avatar}&backgroundColor=fde68a`} className="w-12 h-12 rounded-full border-2 border-orange-100 shrink-0" />
+              <img src={profileImg} className="w-12 h-12 rounded-full border-2 border-orange-100 shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-gray-800">{job.name}</p>
@@ -598,7 +604,7 @@ const MatchmakingSim = ({ onComplete }) => {
              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-orange-100 to-transparent"></div>
              
              <div className="w-24 h-24 rounded-full border-4 border-white shadow-md relative z-10 bg-orange-50 flex items-center justify-center mb-4">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
+                <img src={profileImg} alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
                 <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1 border-2 border-white text-white">
                   <ShieldCheck size={14} />
                 </div>
@@ -737,7 +743,7 @@ const MapView = ({ onComplete }) => {
             <Wrench size={16} />
           </div>
           <div className="mt-1 bg-white rounded-full px-2 py-0.5 shadow text-[10px] font-bold text-orange-600 flex items-center gap-1">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-4 h-4 rounded-full" />
+            <img src={profileImg} className="w-4 h-4 rounded-full" />
             Mang Tonyo
           </div>
         </div>
@@ -755,7 +761,7 @@ const MapView = ({ onComplete }) => {
       {/* Bottom card */}
       <div className="p-4 bg-white border-t border-gray-100 shadow-lg">
         <div className="flex items-center gap-4 mb-4">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-12 h-12 rounded-full border-2 border-orange-300" />
+          <img src={profileImg} className="w-12 h-12 rounded-full border-2 border-orange-300" />
           <div className="flex-1">
             <p className="font-bold text-gray-800">Mang Tonyo</p>
             <p className="text-xs text-gray-500">Electric Fan Specialist • ⭐ 5.0</p>
