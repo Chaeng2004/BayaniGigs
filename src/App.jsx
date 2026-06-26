@@ -99,7 +99,7 @@ export default function App() {
                   Magandang araw! Tell me what skills you have. You can just speak naturally.
                 </ChatBubble>
                 <ChatBubble isUser delay={600}>
-                  marunisya yo compone fan
+                  marunong ako mag ayos ng electric fan 
                 </ChatBubble>
                 
                 <AIProcessingState delay={1200} text="AI is structuring your professional listing..." />
@@ -154,7 +154,7 @@ export default function App() {
           {/* View 3C: Expert Location Map */}
           {currentStep.view === 3 && currentStep.screen === 'C' && (
             <div className="h-full flex flex-col bg-gray-50">
-              <Header title="Expert En Route" />
+              <Header title="Map Route" />
               <MapView onComplete={nextStep} />
             </div>
           )}
