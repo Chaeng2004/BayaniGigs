@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle, Search, User, Briefcase, Star, CreditCard, ChevronRight, UploadCloud, MessageCircle, RefreshCw, Send, Check, Loader2, Sparkles, ShieldCheck, Wallet, ArrowRight, Wrench, Zap, AlertCircle, MapPin, Navigation, Clock } from 'lucide-react';
+import profileImg from './assets/profile.png';
 
 const Logo = ({ className = "text-4xl" }) => (
   <div className={`font-extrabold tracking-tighter flex items-center justify-center drop-shadow-sm ${className}`}>
@@ -195,7 +196,7 @@ export default function App() {
                 
                 <div className="relative mb-8">
                   <div className="w-32 h-32 rounded-full border-4 border-orange-500 flex items-center justify-center bg-white shadow-xl z-10 relative overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" alt="Mang Tonyo" className="w-full h-full object-cover" />
+                    <img src={profileImg} alt="Mang Tonyo" className="w-full h-full object-cover" />
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-gray-50 shadow-sm z-20">
                     <Zap size={20} fill="currentColor" />
@@ -386,7 +387,7 @@ const MatchmakingSim = ({ onComplete }) => {
              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-orange-100 to-transparent"></div>
              
              <div className="w-24 h-24 rounded-full border-4 border-white shadow-md relative z-10 bg-orange-50 flex items-center justify-center mb-4">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
+                <img src={profileImg} alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
                 <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1 border-2 border-white text-white">
                   <ShieldCheck size={14} />
                 </div>
@@ -517,7 +518,7 @@ const MapView = ({ onComplete }) => {
             <Wrench size={16} />
           </div>
           <div className="mt-1 bg-white rounded-full px-2 py-0.5 shadow text-[10px] font-bold text-orange-600 flex items-center gap-1">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-4 h-4 rounded-full" />
+            <img src={profileImg} className="w-4 h-4 rounded-full" />
             Mang Tonyo
           </div>
         </div>
@@ -535,7 +536,7 @@ const MapView = ({ onComplete }) => {
       {/* Bottom card */}
       <div className="p-4 bg-white border-t border-gray-100 shadow-lg">
         <div className="flex items-center gap-4 mb-4">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-12 h-12 rounded-full border-2 border-orange-300" />
+          <img src={profileImg} className="w-12 h-12 rounded-full border-2 border-orange-300" />
           <div className="flex-1">
             <p className="font-bold text-gray-800">Mang Tonyo</p>
             <p className="text-xs text-gray-500">Electric Fan Specialist • ⭐ 5.0</p>
