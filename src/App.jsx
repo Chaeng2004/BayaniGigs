@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle, Search, User, Briefcase, Star, CreditCard, ChevronRight, UploadCloud, MessageCircle, RefreshCw, Send, Check, Loader2, Sparkles, ShieldCheck, Wallet, ArrowRight, Wrench, Zap, AlertCircle, MapPin, Navigation, Clock } from 'lucide-react';
+import profileImg from './assets/profile.png';
 
-const Logo = ({ className = "text-4xl" }) => (
-  <div className={`font-extrabold tracking-tighter flex items-center justify-center drop-shadow-sm ${className}`}>
-    <span className="text-green-600">Bayani</span>
-    <span className="text-orange-500">Gigs</span>
+const Logo = ({ className = "text-3xl", subtitle }) => (
+  <div className={`flex items-center justify-center drop-shadow-sm ${className}`}>
+    <img src={profileImg} alt="BayaniGigs Logo" className="h-[1.1em] w-[1.1em] shrink-0 mr-2.5 object-cover rounded-full border-[3px] border-green-500 shadow-sm" />
+    <div className="flex flex-col items-start">
+      <div className="font-extrabold tracking-tighter leading-none">
+        <span className="text-green-600">Bayani</span>
+        <span className="text-orange-500">Gigs</span>
+      </div>
+      {subtitle && <p className="text-gray-500 mt-1 font-medium text-[15px] tracking-normal">{subtitle}</p>}
+    </div>
   </div>
 );
 
@@ -13,6 +20,7 @@ const steps = [
   { view: 1, screen: 'A', name: 'Role Selection' },
   { view: 2, screen: 'A', name: 'ID Verification' },
   { view: 2, screen: 'B', name: 'Voice-to-Profile' },
+  { view: 5, screen: 'A', name: 'Job Requests' },
   { view: 3, screen: 'A', name: 'Customer Intake' },
   { view: 3, screen: 'B', name: 'Matchmaking' },
   { view: 3, screen: 'C', name: 'Expert Location' },
@@ -23,6 +31,7 @@ const steps = [
 
 export default function App() {
   const [stepIndex, setStepIndex] = useState(0);
+  const [role, setRole] = useState(null); // 'customer' | 'worker'
   const currentStep = steps[stepIndex];
 
   const nextStep = () => {
@@ -30,6 +39,16 @@ export default function App() {
   };
   const prevStep = () => {
     if (stepIndex > 0) setStepIndex(stepIndex - 1);
+  };
+
+  const selectRole = (selectedRole) => {
+    setRole(selectedRole);
+    // worker skips views 3 & 4 (customer-only); customer skips view 2B (worker-only)
+    if (selectedRole === 'worker') {
+      setStepIndex(1); // go to ID Verification
+    } else {
+      setStepIndex(1); // go to ID Verification
+    }
   };
 
   return (
@@ -50,12 +69,11 @@ export default function App() {
             <div className="p-6 h-full flex flex-col justify-center animate-fly-in">
               <div className="flex-1 flex flex-col justify-center items-center space-y-12">
                 <div className="animate-float">
-                  <Logo className="text-6xl" />
-                  <p className="text-center text-gray-500 mt-3 font-medium">Empowering local skills.</p>
+                  <Logo className="text-4xl" subtitle="Empowering local skills." />
                 </div>
                 
                 <div className="w-full space-y-4">
-                  <button onClick={nextStep} className="w-full group relative bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col items-center gap-3 overflow-hidden">
+                  <button onClick={() => selectRole('customer')} className="w-full group relative bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col items-center gap-3 overflow-hidden">
                     <div className="absolute inset-0 bg-green-50 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                     <div className="bg-green-100 p-4 rounded-full relative z-10 text-green-600">
                       <Search size={32} />
@@ -63,7 +81,7 @@ export default function App() {
                     <span className="font-bold text-gray-800 relative z-10 text-lg">I need an expert</span>
                   </button>
 
-                  <button onClick={nextStep} className="w-full group relative bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col items-center gap-3 overflow-hidden">
+                  <button onClick={() => selectRole('worker')} className="w-full group relative bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col items-center gap-3 overflow-hidden">
                     <div className="absolute inset-0 bg-orange-50 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                     <div className="bg-orange-100 p-4 rounded-full relative z-10 text-orange-500">
                       <Wrench size={32} />
@@ -85,106 +103,97 @@ export default function App() {
               </div>
 
               <div className="flex-1">
-                <ScanSimulator onComplete={nextStep} />
+                <IDUploader onComplete={nextStep} />
               </div>
             </div>
           )}
 
-          {/* View 2B: Voice-To-Profile Chat */}
+          {/* View 2B: Voice-To-Profile Chat — workers only */}
           {currentStep.view === 2 && currentStep.screen === 'B' && (
-            <div className="h-full flex flex-col bg-white">
-              <Header title="Profile Setup" />
-              <div className="flex-1 p-4 space-y-6 overflow-y-auto bg-gray-50 flex flex-col">
-                <ChatBubble isAi>
-                  Magandang araw! Tell me what skills you have. You can just speak naturally.
-                </ChatBubble>
-                <ChatBubble isUser delay={600}>
-                  marunong ako mag ayos ng electric fan 
-                </ChatBubble>
-                
-                <AIProcessingState delay={1200} text="AI is structuring your professional listing..." />
-
-                <ChatBubble isAi delay={3000}>
-                  <div>
-                    <p className="mb-3">Perfect! I've categorized your skill as <strong className="text-green-700">Professional Electric Fan Repair</strong> and locked in a suggested fair market rate of <strong>₱350</strong> to ensure you are never underpaid.</p>
-                    <p>Does this look correct?</p>
-                  </div>
-                </ChatBubble>
-                
-                <div className="mt-auto pt-6 pb-2 animate-fly-in" style={{animationDelay: '3.5s', opacity: 0, animationFillMode: 'forwards'}}>
-                  <button onClick={nextStep} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 flex justify-center items-center gap-2">
-                    <Sparkles size={20} />
-                    Approve & List Profile
-                  </button>
-                </div>
-              </div>
-            </div>
+            role === 'worker' ? <LiveProfileChat onComplete={nextStep} /> : <AutoAdvance onMount={nextStep} />
           )}
 
-          {/* View 3A: Customer Intake Chat */}
+          {/* View 5A: Job Requests — workers only */}
+          {currentStep.view === 5 && currentStep.screen === 'A' && (
+            role === 'worker' ? <JobRequestsScreen onComplete={nextStep} /> : <AutoAdvance onMount={nextStep} />
+          )}
+
+          {/* View 3A: Customer Intake Chat — customers only */}
           {currentStep.view === 3 && currentStep.screen === 'A' && (
-            <div className="h-full flex flex-col bg-white">
-              <Header title="Find an Expert" />
-              <div className="flex-1 p-4 space-y-6 overflow-y-auto bg-gray-50">
-                <ChatBubble isAi>
-                  Hello! What issue are you experiencing today? I'll find the perfect expert for you.
-                </ChatBubble>
-                <ChatBubble isUser delay={800}>
-                  sira ang fan ko
-                </ChatBubble>
-                
-                <div className="mt-8 animate-fly-in" style={{animationDelay: '1.5s', opacity: 0, animationFillMode: 'forwards'}}>
-                  <button onClick={nextStep} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex justify-center items-center gap-2">
-                    <Search size={20} />
-                    Find Matches
-                  </button>
-                </div>
-              </div>
-            </div>
+            role === 'customer' ? <LiveIntakeChat onComplete={nextStep} /> : <AutoAdvance onMount={nextStep} />
           )}
 
-          {/* View 3B: AI Matchmaking Engine */}
+          {/* View 3B: AI Matchmaking Engine — customers only */}
           {currentStep.view === 3 && currentStep.screen === 'B' && (
-            <div className="h-full flex flex-col">
-              <Header title="Matchmaking" />
-              <MatchmakingSim onComplete={nextStep} />
-            </div>
+            role === 'customer' ? (
+              <div className="h-full flex flex-col">
+                <Header title="Matchmaking" />
+                <MatchmakingSim onComplete={nextStep} />
+              </div>
+            ) : <AutoAdvance onMount={nextStep} />
           )}
 
-          {/* View 3C: Expert Location Map */}
+          {/* View 3C: Expert Location Map — customers only */}
           {currentStep.view === 3 && currentStep.screen === 'C' && (
-            <div className="h-full flex flex-col bg-gray-50">
-              <Header title="Map Route" />
-              <MapView onComplete={nextStep} />
-            </div>
+            role === 'customer' ? (
+              <div className="h-full flex flex-col bg-gray-50">
+                <Header title="Expert En Route" />
+                <MapView onComplete={nextStep} />
+              </div>
+            ) : <AutoAdvance onMount={nextStep} />
           )}
 
           {/* View 4A: Escrow Gateway */}
           {currentStep.view === 4 && currentStep.screen === 'A' && (
-            <div className="h-full flex flex-col bg-white">
-              <Header title="Secure Checkout" />
-              <div className="p-6 flex-1 flex flex-col animate-fly-in">
-                <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl mb-8 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4 opacity-10"><Shield size={100} /></div>
-                  <h3 className="text-gray-300 font-medium mb-1">Total to Secure</h3>
-                  <div className="text-5xl font-extrabold mb-6">₱350</div>
-                  <div className="flex items-center gap-2 text-sm text-green-400 bg-white/10 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm">
-                    <ShieldCheck size={16} />
-                    <span>Software Escrow Protected</span>
+            role === 'customer' ? (
+              <div className="h-full flex flex-col bg-white">
+                <Header title="Secure Checkout" />
+                <div className="p-6 flex-1 flex flex-col animate-fly-in">
+                  <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl mb-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10"><Shield size={100} /></div>
+                    <h3 className="text-gray-300 font-medium mb-1">Total to Secure</h3>
+                    <div className="text-5xl font-extrabold mb-6">₱350</div>
+                    <div className="flex items-center gap-2 text-sm text-green-400 bg-white/10 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm">
+                      <ShieldCheck size={16} />
+                      <span>Software Escrow Protected</span>
+                    </div>
                   </div>
+                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-auto text-blue-800 text-sm flex gap-3">
+                    <div className="mt-0.5"><AlertCircle size={20} className="text-blue-600"/></div>
+                    <p className="leading-relaxed">Your funds are securely held in escrow and <strong>will not be released</strong> to Mang Tonyo until you mark the job as completely done.</p>
+                  </div>
+                  <button onClick={nextStep} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4.5 rounded-2xl shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 mt-8">
+                    <Wallet size={20} />
+                    Lock ₱350 in Secure Escrow
+                  </button>
                 </div>
-
-                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-auto text-blue-800 text-sm flex gap-3">
-                  <div className="mt-0.5"><AlertCircle size={20} className="text-blue-600"/></div>
-                  <p className="leading-relaxed">Your funds are securely held in escrow and <strong>will not be released</strong> to Mang Tonyo until you mark the job as completely done.</p>
-                </div>
-
-                <button onClick={nextStep} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4.5 rounded-2xl shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 mt-8">
-                  <Wallet size={20} />
-                  Lock ₱350 in Secure Escrow
-                </button>
               </div>
-            </div>
+            ) : (
+              <div className="h-full flex flex-col bg-gray-50">
+                <Header title="Head to Customer" />
+                <div className="flex-1 flex flex-col items-center justify-center p-6 animate-fly-in">
+                  <div className="relative mb-8">
+                    <div className="w-32 h-32 rounded-full border-4 border-green-500 bg-white shadow-xl flex items-center justify-center overflow-hidden relative z-10">
+                      <img src={profileImg} alt="Customer" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white p-2 rounded-full border-4 border-gray-50 shadow-sm z-20">
+                      <MapPin size={20} fill="currentColor" />
+                    </div>
+                    <div className="absolute inset-0 rounded-full border-4 border-green-400 animate-ping opacity-20"></div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-1">Maria Santos</h2>
+                  <p className="text-gray-500 text-sm mb-1">0.3 km away</p>
+                  <p className="text-orange-600 font-medium text-sm mb-8 text-center max-w-[220px]">Palikpik ng electric fan ko ay sira</p>
+                  <div className="bg-white rounded-2xl p-4 w-full flex justify-between items-center border border-gray-100 shadow-sm mb-8">
+                    <span className="text-gray-500 text-sm">Your Guaranteed Pay</span>
+                    <span className="text-2xl font-black text-gray-900">₱350</span>
+                  </div>
+                  <button onClick={nextStep} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 flex justify-center items-center gap-2">
+                    <Navigation size={20} /> I'm On My Way
+                  </button>
+                </div>
+              </div>
+            )
           )}
 
           {/* View 4B: Job Completion */}
@@ -192,24 +201,24 @@ export default function App() {
             <div className="h-full flex flex-col bg-gray-50">
               <Header title="Active Job" />
               <div className="flex-1 p-6 flex flex-col justify-center items-center animate-fly-in">
-                
                 <div className="relative mb-8">
                   <div className="w-32 h-32 rounded-full border-4 border-orange-500 flex items-center justify-center bg-white shadow-xl z-10 relative overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" alt="Mang Tonyo" className="w-full h-full object-cover" />
+                    <img src={profileImg} alt="User" className="w-full h-full object-cover" />
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-gray-50 shadow-sm z-20">
                     <Zap size={20} fill="currentColor" />
                   </div>
-                  {/* Pulsing ring */}
                   <div className="absolute inset-0 rounded-full border-4 border-orange-500 animate-ping opacity-20"></div>
                 </div>
-
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Job in Progress</h2>
-                <p className="text-gray-500 text-center mb-10 max-w-[250px]">Mang Tonyo is fixing your electric fan. Once he finishes, release the funds.</p>
-
+                <p className="text-gray-500 text-center mb-10 max-w-[250px]">
+                  {role === 'worker'
+                    ? "You're fixing Maria's electric fan. Mark it done when finished."
+                    : "Mang Tonyo is fixing your electric fan. Once he finishes, release the funds."}
+                </p>
                 <button onClick={nextStep} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4.5 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 flex justify-center items-center gap-2 mt-auto">
                   <CheckCircle size={22} />
-                  Job Completed Successfully
+                  {role === 'worker' ? 'Mark Job as Done' : 'Job Completed Successfully'}
                 </button>
               </div>
             </div>
@@ -217,7 +226,7 @@ export default function App() {
 
           {/* View 4C: Funds Released & Rating */}
           {currentStep.view === 4 && currentStep.screen === 'C' && (
-            <RatingScreen />
+            <RatingScreen role={role} />
           )}
 
         </div>
@@ -244,6 +253,11 @@ export default function App() {
 }
 
 // --- Subcomponents ---
+
+const AutoAdvance = ({ onMount }) => {
+  useEffect(() => { onMount(); }, []);
+  return null;
+};
 
 const Header = ({ title }) => (
   <div className="bg-white px-6 pt-4 pb-4 border-b border-gray-100 flex items-center justify-center sticky top-0 z-30">
@@ -297,56 +311,260 @@ const AIProcessingState = ({ delay, text }) => {
   );
 };
 
-const ScanSimulator = ({ onComplete }) => {
-  const [status, setStatus] = useState('idle'); // idle, scanning, verified
+const IDUploader = ({ onComplete }) => {
+  const [preview, setPreview] = useState(null);
+  const [status, setStatus] = useState('idle'); // idle, verifying, verified
 
-  const handleScan = () => {
-    setStatus('scanning');
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPreview(URL.createObjectURL(file));
+    setStatus('verifying');
     setTimeout(() => {
       setStatus('verified');
-      setTimeout(onComplete, 2000);
+      setTimeout(onComplete, 1500);
     }, 2500);
   };
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 flex flex-col justify-center items-center">
-        
         {status === 'idle' && (
-          <div className="w-full aspect-[1.6] border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-6 text-center animate-fly-in">
+          <label className="w-full aspect-[1.6] border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all animate-fly-in">
             <UploadCloud size={48} className="text-gray-400 mb-4" />
-            <p className="text-gray-600 font-medium">Position your ID inside the frame</p>
+            <p className="text-gray-600 font-medium">Tap to upload your ID</p>
             <p className="text-xs text-gray-400 mt-2">Driver's License, Passport, or National ID</p>
-          </div>
+            <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          </label>
         )}
 
-        {status === 'scanning' && (
+        {status === 'verifying' && (
           <div className="w-full aspect-[1.6] border-2 border-blue-400 bg-blue-50 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-blue-400/20 animate-scan h-1/2 blur-xl"></div>
+            {preview && <img src={preview} className="absolute inset-0 w-full h-full object-cover opacity-30" />}
             <div className="absolute inset-x-0 h-0.5 bg-blue-500 animate-scan shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
             <Loader2 className="animate-spin text-blue-600 w-10 h-10 mb-3 relative z-10" />
-            <p className="text-blue-800 font-semibold relative z-10">Extracting details...</p>
+            <p className="text-blue-800 font-semibold relative z-10">Verifying ID...</p>
           </div>
         )}
 
         {status === 'verified' && (
-          <div className="w-full aspect-[1.6] border-2 border-green-500 bg-green-50 rounded-2xl flex flex-col items-center justify-center p-6 text-center animate-pop">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4 shadow-inner">
-               <ShieldCheck size={32} />
+          <div className="w-full aspect-[1.6] border-2 border-green-500 bg-green-50 rounded-2xl flex flex-col items-center justify-center p-6 text-center animate-pop relative overflow-hidden">
+            {preview && <img src={preview} className="absolute inset-0 w-full h-full object-cover opacity-20" />}
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4 shadow-inner relative z-10">
+              <ShieldCheck size={32} />
             </div>
-            <h3 className="text-green-800 font-bold text-lg mb-1">Verified Identity</h3>
-            <p className="text-green-700/80 text-sm font-medium">Securely Enforced</p>
+            <h3 className="text-green-800 font-bold text-lg mb-1 relative z-10">Verified Identity</h3>
+            <p className="text-green-700/80 text-sm font-medium relative z-10">Securely Enforced</p>
           </div>
         )}
-
       </div>
-      
-      <button 
-        onClick={handleScan}
-        disabled={status !== 'idle'}
-        className="w-full mt-8 bg-gray-900 hover:bg-black text-white font-bold py-4.5 rounded-2xl shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-        {status === 'idle' ? 'Simulate Scan' : status === 'scanning' ? 'Verifying...' : 'Verified!'}
-      </button>
+    </div>
+  );
+};
+
+const JobRequestsScreen = ({ onComplete }) => {
+  const jobs = [
+    { id: 1, name: 'Maria Santos', avatar: 'Maria', issue: 'Palikpik ng electric fan ko ay sira', location: '0.3 km away', budget: '₱350', time: '2 min ago', urgent: true },
+    { id: 2, name: 'Juan dela Cruz', avatar: 'Juan', issue: 'Hindi umiikot ang fan, may amoy na sunog', location: '0.8 km away', budget: '₱400', time: '5 min ago', urgent: false },
+    { id: 3, name: 'Nena Reyes', avatar: 'Nena', issue: 'Maingay na ang electric fan namin', location: '1.2 km away', budget: '₱300', time: '12 min ago', urgent: false },
+  ];
+  const [accepted, setAccepted] = useState(null);
+
+  if (accepted) {
+    return (
+      <div className="h-full flex flex-col bg-white">
+        <Header title="Job Accepted" />
+        <div className="flex-1 flex flex-col items-center justify-center p-6 animate-fly-in">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-6 shadow-inner">
+            <CheckCircle size={40} />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Job Accepted!</h2>
+          <p className="text-gray-500 text-center mb-2 text-sm">You accepted a job from</p>
+          <p className="font-bold text-gray-800 text-lg mb-1">{accepted.name}</p>
+          <p className="text-gray-500 text-sm text-center mb-8 max-w-[240px]">{accepted.issue}</p>
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 w-full flex justify-between items-center mb-8">
+            <span className="text-gray-500 text-sm">Guaranteed Pay</span>
+            <span className="text-2xl font-black text-gray-900">{accepted.budget}</span>
+          </div>
+          <button onClick={onComplete} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all active:scale-95 flex justify-center items-center gap-2">
+            <Navigation size={20} /> Head to Customer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-gray-50">
+      <Header title="Job Requests" />
+      <div className="p-4 space-y-3 overflow-y-auto flex-1">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">{jobs.length} requests near you</span>
+        </div>
+        {jobs.map(job => (
+          <div key={job.id} className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 animate-fly-in">
+            <div className="flex items-start gap-3 mb-3">
+              <img src={profileImg} className="w-12 h-12 rounded-full border-2 border-orange-100 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-gray-800">{job.name}</p>
+                  {job.urgent && <span className="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Urgent</span>}
+                </div>
+                <p className="text-sm text-gray-500 mt-0.5 leading-snug">{job.issue}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+              <span className="flex items-center gap-1"><MapPin size={12} />{job.location}</span>
+              <span className="flex items-center gap-1"><Clock size={12} />{job.time}</span>
+              <span className="font-bold text-gray-700 text-sm">{job.budget}</span>
+            </div>
+            <button
+              onClick={() => setAccepted(job)}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-2xl transition-all active:scale-95 flex justify-center items-center gap-2 text-sm"
+            >
+              <CheckCircle size={16} /> Accept Job
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const LiveProfileChat = ({ onComplete }) => {
+  const [messages, setMessages] = useState([{ from: 'ai', text: 'Magandang araw! Tell me what skills you have.' }]);
+  const [input, setInput] = useState('');
+  const [replied, setReplied] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const bottomRef = React.useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, processing]);
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text || replied) return;
+    setMessages(prev => [...prev, { from: 'user', text }]);
+    setInput('');
+    setProcessing(true);
+    setTimeout(() => {
+      setProcessing(false);
+      setReplied(true);
+      setMessages(prev => [...prev, {
+        from: 'ai',
+        text: `Perfect! I've listed your skill as "${text}" and suggested a fair rate of ₱350. Does this look correct?`
+      }]);
+    }, 2000);
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-white">
+      <Header title="Profile Setup" />
+      <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50">
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex w-full ${msg.from === 'ai' ? 'justify-start' : 'justify-end'} animate-pop`}>
+            <div className={`max-w-[85%] p-4 text-[15px] leading-relaxed shadow-sm ${
+              msg.from === 'ai'
+                ? 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm'
+                : 'bg-green-600 text-white rounded-2xl rounded-tr-sm'
+            }`}>
+              {msg.from === 'ai' && <div className="flex items-center gap-1.5 mb-1.5 opacity-70 text-[11px] font-bold uppercase tracking-wide text-green-700"><Sparkles size={12} /> AI Coordinator</div>}
+              {msg.text}
+            </div>
+          </div>
+        ))}
+        {processing && (
+          <div className="flex justify-start animate-fly-in">
+            <div className="bg-blue-50 border border-blue-100 text-blue-700 rounded-2xl rounded-tl-sm p-4 flex items-center gap-3 text-sm font-medium">
+              <Loader2 className="animate-spin w-5 h-5 text-blue-600" />
+              AI is structuring your professional listing...
+            </div>
+          </div>
+        )}
+        {replied && (
+          <button onClick={onComplete} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 flex justify-center items-center gap-2 animate-fly-in">
+            <Sparkles size={20} /> Approve & List Profile
+          </button>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <div className="p-3 bg-white border-t border-gray-100 flex gap-2">
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
+          placeholder="Tell us your skills..."
+          disabled={replied}
+          className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
+        />
+        <button onClick={handleSend} disabled={replied} className="bg-green-600 text-white p-3 rounded-2xl hover:bg-green-700 transition active:scale-95 disabled:opacity-50">
+          <Send size={18} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const LiveIntakeChat = ({ onComplete }) => {
+  const [messages, setMessages] = useState([{ from: 'ai', text: "Hello! What issue are you experiencing today? I'll find the perfect expert for you." }]);
+  const [input, setInput] = useState('');
+  const [replied, setReplied] = useState(false);
+  const bottomRef = React.useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text) return;
+    setMessages(prev => [...prev, { from: 'user', text }]);
+    setInput('');
+    if (!replied) {
+      setReplied(true);
+      setTimeout(() => {
+        setMessages(prev => [...prev, { from: 'ai', text: `Got it! Looking for experts who can help with: "${text}". Ready to find matches?` }]);
+      }, 1000);
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-white">
+      <Header title="Find an Expert" />
+      <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50">
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex w-full ${msg.from === 'ai' ? 'justify-start' : 'justify-end'} animate-pop`}>
+            <div className={`max-w-[85%] p-4 text-[15px] leading-relaxed shadow-sm ${
+              msg.from === 'ai'
+                ? 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm'
+                : 'bg-green-600 text-white rounded-2xl rounded-tr-sm'
+            }`}>
+              {msg.from === 'ai' && <div className="flex items-center gap-1.5 mb-1.5 opacity-70 text-[11px] font-bold uppercase tracking-wide text-green-700"><Sparkles size={12} /> AI Coordinator</div>}
+              {msg.text}
+            </div>
+          </div>
+        ))}
+        {replied && (
+          <button onClick={onComplete} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex justify-center items-center gap-2 animate-fly-in">
+            <Search size={20} /> Find Matches
+          </button>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <div className="p-3 bg-white border-t border-gray-100 flex gap-2">
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
+          placeholder="Describe your problem..."
+          className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-400"
+        />
+        <button onClick={handleSend} className="bg-green-600 text-white p-3 rounded-2xl hover:bg-green-700 transition active:scale-95">
+          <Send size={18} />
+        </button>
+      </div>
     </div>
   );
 };
@@ -386,7 +604,7 @@ const MatchmakingSim = ({ onComplete }) => {
              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-orange-100 to-transparent"></div>
              
              <div className="w-24 h-24 rounded-full border-4 border-white shadow-md relative z-10 bg-orange-50 flex items-center justify-center mb-4">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
+                <img src={profileImg} alt="Mang Tonyo" className="w-full h-full object-cover rounded-full" />
                 <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1 border-2 border-white text-white">
                   <ShieldCheck size={14} />
                 </div>
@@ -417,7 +635,7 @@ const MatchmakingSim = ({ onComplete }) => {
   );
 };
 
-const RatingScreen = () => {
+const RatingScreen = ({ role }) => {
   const [rating, setRating] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -426,22 +644,30 @@ const RatingScreen = () => {
     if (r === 5) setShowConfetti(true);
   };
 
+  const isWorker = role === 'worker';
+
   return (
     <div className="h-full flex flex-col bg-white overflow-hidden relative">
       {showConfetti && <ConfettiOverlay />}
       
       <div className="p-8 flex flex-col items-center justify-center flex-1 z-10">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-6 shadow-inner animate-pop">
-           <Wallet size={40} className="animate-float" />
+          {isWorker ? <Wallet size={40} className="animate-float" /> : <Wallet size={40} className="animate-float" />}
         </div>
         
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-2 text-center tracking-tight animate-fly-in">Funds Released!</h2>
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-2 text-center tracking-tight animate-fly-in">
+          {isWorker ? 'Payment Received!' : 'Funds Released!'}
+        </h2>
         <p className="text-gray-500 text-center mb-10 text-sm max-w-[250px] animate-fly-in" style={{animationDelay: '0.1s', opacity: 0, animationFillMode: 'forwards'}}>
-          ₱350 has been securely transferred to Mang Tonyo's wallet ledger.
+          {isWorker
+            ? '₱350 has been securely transferred to your wallet ledger.'
+            : '₱350 has been securely transferred to Mang Tonyo\'s wallet ledger.'}
         </p>
 
         <div className="bg-gray-50 w-full rounded-3xl p-8 border border-gray-100 shadow-sm animate-fly-in" style={{animationDelay: '0.2s', opacity: 0, animationFillMode: 'forwards'}}>
-          <h3 className="text-center font-bold text-gray-800 mb-6 text-lg">Rate Mang Tonyo</h3>
+          <h3 className="text-center font-bold text-gray-800 mb-6 text-lg">
+            {isWorker ? 'Rate Maria Santos' : 'Rate Mang Tonyo'}
+          </h3>
           <div className="flex justify-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button 
@@ -455,7 +681,7 @@ const RatingScreen = () => {
           </div>
           {rating > 0 && (
             <p className="text-center text-green-600 font-bold mt-6 animate-pop text-sm">
-              Thanks! This builds his reputation.
+              {isWorker ? 'Thanks! This builds your reputation.' : 'Thanks! This builds his reputation.'}
             </p>
           )}
         </div>
@@ -517,7 +743,7 @@ const MapView = ({ onComplete }) => {
             <Wrench size={16} />
           </div>
           <div className="mt-1 bg-white rounded-full px-2 py-0.5 shadow text-[10px] font-bold text-orange-600 flex items-center gap-1">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-4 h-4 rounded-full" />
+            <img src={profileImg} className="w-4 h-4 rounded-full" />
             Mang Tonyo
           </div>
         </div>
@@ -535,7 +761,7 @@ const MapView = ({ onComplete }) => {
       {/* Bottom card */}
       <div className="p-4 bg-white border-t border-gray-100 shadow-lg">
         <div className="flex items-center gap-4 mb-4">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tonyo&backgroundColor=b6e3f4" className="w-12 h-12 rounded-full border-2 border-orange-300" />
+          <img src={profileImg} className="w-12 h-12 rounded-full border-2 border-orange-300" />
           <div className="flex-1">
             <p className="font-bold text-gray-800">Mang Tonyo</p>
             <p className="text-xs text-gray-500">Electric Fan Specialist • ⭐ 5.0</p>
